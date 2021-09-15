@@ -268,7 +268,7 @@ const Header = ( props ) => {
                         <br /><br />
                         {loginFailure === true &&
                             <FormControl>
-                                <span >
+                                <span className="changecolor">
                                     Login Failed. Retry !!
                                 </span>
                             </FormControl>

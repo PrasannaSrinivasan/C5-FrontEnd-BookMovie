@@ -44,24 +44,22 @@ const BookShow = (props) => {
       },
       body: dataShows,
     })
-      .then((response) => response.json())
-      .then((response) => {
-        setOriginalShows(response.shows);
+    .then((response) => response.json())
+    .then((response) => {
+      setOriginalShows(response.shows);
+      let newLocations = [];
+      for (let show of response.shows) {
+        newLocations.push({
+          id: show.theatre.city,
+          location: show.theatre.city,
+        });
+      }
 
-        let newLocations = [];
-
-        for (let show of response.shows) {
-          newLocations.push({
-            id: show.theatre.city,
-            location: show.theatre.city,
-          });
-        }
-
-        newLocations = newLocations.filter(
-          (loc, index, self) => index === self.findIndex((c) => c.id === loc.id)
-        );
-        setLocations(newLocations);
-      });
+      newLocations = newLocations.filter(
+        (loc, index, self) => index === self.findIndex((c) => c.id === loc.id)
+      );
+      setLocations(newLocations);
+    });
   }, []);
 
   const locationChangeHandler = (event) => {
@@ -78,15 +76,12 @@ const BookShow = (props) => {
       (theatre, index, self) =>
         index === self.findIndex((t) => t.id === theatre.id)
     );
-
     setTheatres(newTheatres);
   };
 
   const theatreChangeHandler = (event) => {
     setTheatre(event.target.value);
-
     let newLanguages = [];
-
     for (let show of originalShows) {
       if (
         show.theatre.city === location &&
@@ -104,7 +99,6 @@ const BookShow = (props) => {
 
   const languageChangeHandler = (event) => {
     setLanguage(event.target.value);
-
     let newShowDates = [];
 
     for (let show of originalShows) {
@@ -125,7 +119,6 @@ const BookShow = (props) => {
 
   const showDateChangeHandler = (event) => {
     setShowDate(event.target.value);
-
     let unitPrice = 0;
     let availableTickets = 0;
 
