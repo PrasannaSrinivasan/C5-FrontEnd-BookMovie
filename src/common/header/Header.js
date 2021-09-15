@@ -43,6 +43,7 @@ const Header = ( props ) => {
     const [username, setUserName] = useState("");
     const [loginPasswordRequired, setLoginPasswordRequired] = useState("dispNone");
     const [loginPassword, setLoginPassword] = useState("");
+    const [loginFailure, setLoginFailure] = useState(false);
     const [firstnameRequired, setFirstNameRequired ] =useState("dispNone");
     const [firstname, setFirstName] = useState("");
     const [lastnameRequired, setLastNameRequired] = useState("dispNone");
@@ -60,6 +61,19 @@ const Header = ( props ) => {
     const openModalHandler = () => {     
         setModalIsOpen(true);
         setValue(0);
+        resetModalFields();
+    }
+
+    const closeModalHandler = () => {
+        setModalIsOpen(false);
+    }
+
+    const tabChangeHandler = (event, value) => {
+        resetModalFields();
+        setValue(value);
+    }
+
+    const resetModalFields = () => {
         setUserNameRequired("dispNone");
         setUserName("");
         setLoginPasswordRequired("dispNone");
@@ -74,14 +88,8 @@ const Header = ( props ) => {
         setRegisterPassword("");
         setContactRequired("dispNone");
         setContact("");
-    }
-
-    const closeModalHandler = () => {
-        setModalIsOpen(false);
-    }
-
-    const tabChangeHandler = (event, value) => {
-        setValue(value);
+        setLoginFailure(false);
+        setRegistrationSuccess(false);
     }
 
     const  loginClickHandler = () => {
@@ -119,7 +127,9 @@ const Header = ( props ) => {
             setLoggedIn(true);
             closeModalHandler();
 
-        }).catch((error) => {});
+        }).catch((error) => {
+            setLoginFailure(true);
+        });
     };
     
     const  inputUsernameChangeHandler = (e) => {
@@ -130,13 +140,17 @@ const Header = ( props ) => {
         setLoginPassword(e.target.value);
     }
 
-    const  registerClickHandler = () => {
+    const registerClickHandler = () => {
 
-        setFirstName === "" ? setFirstNameRequired("dispBlock" ) : setFirstNameRequired("dispNone");
-        setLastName === "" ? setLastNameRequired("dispBlock") : setLastNameRequired("dispNone");
-        setEmail === "" ? setEmailRequired("dispBlock") : setEmailRequired("dispNone");
-        setRegisterPassword === "" ? setRegisterPasswordRequired("dispBlock") : setRegisterPasswordRequired("dispNone");
-        setContact === "" ? setContactRequired("dispBlock") : setContactRequired("dispNone");
+        firstname === "" ? setFirstNameRequired("dispBlock" ) : setFirstNameRequired("dispNone");
+        lastname === "" ? setLastNameRequired("dispBlock") : setLastNameRequired("dispNone");
+        email === "" ? setEmailRequired("dispBlock") : setEmailRequired("dispNone");
+        registerPassword === "" ? setRegisterPasswordRequired("dispBlock") : setRegisterPasswordRequired("dispNone");
+        contact === "" ? setContactRequired("dispBlock") : setContactRequired("dispNone");
+
+        if(firstname === "" || lastname === "" || email === "" || registerPassword === "" || contact === "" ){
+            return;
+        }
 
         let dataSignup = JSON.stringify({
             email_address: email,
@@ -145,7 +159,7 @@ const Header = ( props ) => {
             mobile_number:contact,
             password: registerPassword
         });
-
+        
         fetch(props.baseUrl + "signup",{
             method: "POST",
             headers: {
@@ -181,7 +195,6 @@ const Header = ( props ) => {
     const logoutHandler = (e) => {
         sessionStorage.removeItem("uuid");
         sessionStorage.removeItem("access-token");
-        console.log(' reached here');
         setLoggedIn(false);
     }
 
@@ -190,20 +203,20 @@ const Header = ( props ) => {
             <header className="header">
                 <img src={logo} className="app-logo" alt="Movies App Logo" />
                 {!loggedIn ?
-                    <div className="lgn-btn">
+                    <div className="login-btn">
                         <Button variant="contained" color="default" onClick={openModalHandler}>
                             Login
                         </Button>
                     </div>
                     :
-                    <div className="lgn-btn">
+                    <div className="login-btn">
                         <Button variant="contained" color="default" onClick={logoutHandler}>
                             Logout
                         </Button>
                     </div>
                 }
                 {props.showBookShowButton === "true" && !loggedIn
-                    ? <div className="bs-btn">
+                    ? <div className="book-show-btn">
                         <Button variant="contained" color="primary" onClick={openModalHandler}>
                             Book Show
                         </Button>
@@ -212,7 +225,7 @@ const Header = ( props ) => {
                 }
 
                 {props.showBookShowButton === "true" && loggedIn
-                    ? <div className="bs-btn">
+                    ? <div className="book-show-btn">
                         <Link to={"/bookshow/" + props.id}>
                             <Button variant="contained" color="primary">
                                 Book Show
@@ -253,10 +266,10 @@ const Header = ( props ) => {
                             </FormHelperText>
                         </FormControl>
                         <br /><br />
-                        {loggedIn === true &&
+                        {loginFailure === true &&
                             <FormControl>
-                                <span >
-                                    Login Successful!
+                                <span className="changecolor">
+                                    Login Failed. Retry !!
                                 </span>
                             </FormControl>
                         }
